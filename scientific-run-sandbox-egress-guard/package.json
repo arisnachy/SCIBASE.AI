@@ -1,0 +1,14 @@
+{
+  "name": "scientific-run-sandbox-egress-guard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "node test.js",
+    "demo": "node demo.js",
+    "demo:video": "node scripts/record-demo.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}

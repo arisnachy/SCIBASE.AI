@@ -1,0 +1,117 @@
+[
+  {
+    "runId": "safe-notebook-deny-egress",
+    "title": "Pinned notebook rerun with restricted clinical table",
+    "decision": "allow",
+    "score": 100,
+    "inputRisk": "restricted",
+    "blockers": [],
+    "holds": [],
+    "actions": [],
+    "reviewedAt": "2026-05-29T11:18:21.829Z",
+    "auditHash": "1d048c373074e38520dde37ca87988e421593441b42d850f59efecda7ffa77a8"
+  },
+  {
+    "runId": "restricted-open-egress",
+    "title": "Unpinned privileged run with public output",
+    "decision": "block",
+    "score": 0,
+    "inputRisk": "restricted",
+    "blockers": [
+      {
+        "code": "unpinned-runtime-image",
+        "message": "Runtime image is not pinned by sha256 digest.",
+        "action": "Pin the Docker image with an immutable sha256 digest."
+      },
+      {
+        "code": "privileged-runtime",
+        "message": "Runtime requests privileged execution.",
+        "action": "Run the workload without privileged mode or privilege escalation."
+      },
+      {
+        "code": "dangerous-capability",
+        "message": "Runtime requests dangerous Linux capability SYS_ADMIN.",
+        "action": "Drop dangerous capabilities from the sandbox profile."
+      },
+      {
+        "code": "writable-host-mount",
+        "message": "Host path C:/research/raw is writable.",
+        "action": "Use content-addressed artifact mounts or read-only mounts only."
+      },
+      {
+        "code": "restricted-open-egress",
+        "message": "Restricted or private inputs cannot run with open network egress.",
+        "action": "Use deny egress or a reviewed allowlist for restricted data."
+      },
+      {
+        "code": "restricted-public-output",
+        "message": "Output public/results.csv is public without redaction approval.",
+        "action": "Keep output private or attach data steward redaction approval."
+      }
+    ],
+    "holds": [
+      {
+        "code": "oversized-resource-request",
+        "message": "Resource request exceeds reviewer-ready sandbox defaults.",
+        "action": "Route oversized runs to manual compute review."
+      }
+    ],
+    "actions": [
+      "Pin the Docker image with an immutable sha256 digest.",
+      "Run the workload without privileged mode or privilege escalation.",
+      "Drop dangerous capabilities from the sandbox profile.",
+      "Use content-addressed artifact mounts or read-only mounts only.",
+      "Use deny egress or a reviewed allowlist for restricted data.",
+      "Route oversized runs to manual compute review.",
+      "Keep output private or attach data steward redaction approval."
+    ],
+    "reviewedAt": "2026-05-29T11:18:21.832Z",
+    "auditHash": "737ceeea8dcda346fac9cab9b25a424c3db929e900d2eee0e2004880788c0a7b"
+  },
+  {
+    "runId": "scheduled-rerun-needs-seed",
+    "title": "Scheduled public benchmark missing reproducibility seed",
+    "decision": "hold",
+    "score": 80,
+    "inputRisk": "public",
+    "blockers": [],
+    "holds": [
+      {
+        "code": "scheduled-unpinned-input",
+        "message": "Scheduled rerun has at least one input without a version pin.",
+        "action": "Pin every scheduled input to a dataset version."
+      },
+      {
+        "code": "scheduled-missing-seed",
+        "message": "Scheduled rerun lacks deterministic seed evidence.",
+        "action": "Record a deterministic seed or explain why the run is deterministic without one."
+      }
+    ],
+    "actions": [
+      "Pin every scheduled input to a dataset version.",
+      "Record a deterministic seed or explain why the run is deterministic without one."
+    ],
+    "reviewedAt": "2026-05-29T11:18:21.832Z",
+    "auditHash": "4fa03c313027b278f9a608f7b51f251a0187f826d1a11f85d05479fbe10c7ffc"
+  },
+  {
+    "runId": "restricted-allowlist-review",
+    "title": "Restricted DOI enrichment needs egress reviewer approval",
+    "decision": "hold",
+    "score": 90,
+    "inputRisk": "restricted",
+    "blockers": [],
+    "holds": [
+      {
+        "code": "restricted-egress-needs-review",
+        "message": "Restricted data egress allowlist lacks reviewer approval.",
+        "action": "Record reviewer approval for each allowed destination."
+      }
+    ],
+    "actions": [
+      "Record reviewer approval for each allowed destination."
+    ],
+    "reviewedAt": "2026-05-29T11:18:21.832Z",
+    "auditHash": "d942cbd10139d0d35864803757940c43ad1d228f299b6767a1868ff60153c3cf"
+  }
+]
