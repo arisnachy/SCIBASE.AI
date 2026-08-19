@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - '.github/workflows/max5_edge_selftest.yml'
+  pull_request:
+    paths:
+      - 'tmp/MAX5_EDGE_TRIGGER.txt'
   workflow_dispatch:
 
 permissions:
