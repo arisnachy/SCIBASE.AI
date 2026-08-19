@@ -1,0 +1,33 @@
+name: MAX5 Edge Selftest
+
+on:
+  push:
+    paths:
+      - '.github/workflows/max5_edge_selftest.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  selftest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call stateless Juancito failover
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL='https://lrgixxftugjokmymntxz.supabase.co/functions/v1/max5-today-football-v3-live?action=selftest'
+          curl --fail --silent --show-error --max-time 30 "$URL" | tee /tmp/max5.json
+          python3 - <<'PY'
+          import json
+          d=json.load(open('/tmp/max5.json'))
+          assert d.get('ok') is True, d
+          assert d.get('postgres_required') is False, d
+          assert isinstance(d.get('mls_pregame_2026_08_19'), int), d
+          print('MAX5_EDGE_SELFTEST_OK')
+          print('MLS_PREGAME', d['mls_pregame_2026_08_19'])
+          for g in d.get('sample') or []:
+              print(g)
+          PY
